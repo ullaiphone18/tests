@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monamierri Bots - Разработка Telegram ботов</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+        }
+
+        :root {
+            --primary: #6F55B8;
+            --primary-dark: #5a4496;
+            --accent: #699BD8;
+            --secondary: #BCB5E9;
+            --dark-blue: #00377A;
+            --teal: #04878F;
+            --mint: #91E2C2;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+            --text: #ffffff;
+            --text-light: #f0f0f0;
+            --bg: #0a0a0a;
+            --bg-gradient: linear-gradient(135deg, #0a0a0a 0%, #00377A 50%, #04878F 100%);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Стеклянный эффект */
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Анимированный фон */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+
+        .circle-1 { background: radial-gradient(circle, var(--primary) 0%, transparent 70%); }
+        .circle-2 { background: radial-gradient(circle, var(--accent) 0%, transparent 70%); }
+        .circle-3 { background: radial-gradient(circle, var(--teal) 0%, transparent 70%); }
+        .circle-4 { background: radial-gradient(circle, var(--mint) 0%, transparent 70%); }
+        .circle-5 { background: radial-gradient(circle, var(--secondary) 0%, transparent 70%); }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            50% {
+                transform: translate(20px, 20px) rotate(180deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        header {
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            border-radius: 15px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 0 10px rgba(111, 85, 184, 0.5);
+            font-family: 'Nunito', sans-serif;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        .logo span {
+            color: var(--secondary);
+            margin-left: 5px;
+            vertical-align: baseline;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 24px;
+            color: var(--accent);
+            vertical-align: middle;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+            padding: 5px 0;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(90deg, var(--primary), var(--mint));
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+
+        .hero {
+            padding: 180px 0 100px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 50px;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(111, 85, 184, 0.5);
+            font-weight: 900;
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin: 0 auto 30px;
+            color: var(--text-light);
+            max-width: 600px;
+            font-weight: 700;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 14px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 900;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(111, 85, 184, 0.4);
+            font-size: 18px;
+        }
+
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--dark-blue));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(111, 85, 184, 0.6);
+        }
+
+        .btn:hover:before {
+            left: 100%;
+        }
+
+        .products {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            font-size: 36px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(111, 85, 184, 0.5);
+            font-weight: 900;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(111, 85, 184, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .product-card:hover:before {
+            opacity: 1;
+        }
+
+        .product-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(111, 85, 184, 0.3);
+        }
+
+        .product-card h3 {
+            margin-bottom: 15px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        .product-card p {
+            color: var(--text-light);
+            font-weight: 700;
+        }
+
+        .features {
+            padding: 100px 0;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(105, 155, 216, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-card:hover:before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--mint));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(105, 155, 216, 0.3);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 15px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-weight: 700;
+        }
+
+        .pricing {
+            padding: 100px 0;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .pricing-card {
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .pricing-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(4, 135, 143, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .pricing-card:hover:before {
+            opacity: 1;
+        }
+
+        .pricing-card h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #fff;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+        }
+
+        .price {
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(111, 85, 184, 0.3);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pricing-card ul {
+            list-style: none;
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+
+        .pricing-card ul li {
+            margin-bottom: 10px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .pricing-card ul li i {
+            margin-right: 10px;
+            color: var(--mint);
+        }
+
+        .pricing-footer {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .price-btn-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .contact {
+            padding: 100px 0;
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 50px;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-info {
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .telegram-cta {
+            text-align: center;
+        }
+
+        .telegram-cta .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 18px;
+            padding: 18px 40px;
+        }
+
+        .telegram-cta p {
+            font-size: 18px;
+            margin-bottom: 25px;
+            color: var(--text-light);
+            font-weight: 700;
+        }
+
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .footer-content p {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .social-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .social-links li {
+            margin-left: 20px;
+        }
+
+        .social-links a {
+            color: #ffffff;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--secondary);
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .social-links {
+                margin-top: 10px;
+            }
+        }
+
+        /* 3D эффекты для карточек */
+        .card-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Анимированный фон -->
+    <div class="bg-animation">
+        <div class="bg-circle circle-1" style="width: 500px; height: 500px; top: -200px; left: -100px; animation-delay: 0s;"></div>
+        <div class="bg-circle circle-2" style="width: 300px; height: 300px; top: 50%; right: -100px; animation-delay: 5s;"></div>
+        <div class="bg-circle circle-3" style="width: 400px; height: 400px; bottom: -200px; left: 50%; animation-delay: 10s;"></div>
+        <div class="bg-circle circle-4" style="width: 350px; height: 350px; top: 20%; right: 20%; animation-delay: 7s;"></div>
+        <div class="bg-circle circle-5" style="width: 450px; height: 450px; bottom: 10%; right: -50px; animation-delay: 3s;"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <div class="header-content glass">
+                <div class="logo">
+                    <i class="fab fa-telegram"></i>
+                    Monamierri<span>Bots</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#products">Продукты</a></li>
+                    <li><a href="#features">Возможности</a></li>
+                    <li><a href="#pricing">Цены</a></li>
+                    <li><a href="#contact">Контакты</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content glass">
+                <h1>Профессиональная разработка Telegram ботов</h1>
+                <p>Создаем мощные и эффективные боты для автоматизации вашего бизнеса и личных проектов</p>
+                <a href="#contact" class="btn">Заказать бота</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="products" id="products">
+        <div class="container">
+            <h2 class="section-title">Наши продукты</h2>
+            <div class="products-grid">
+                <div class="product-card glass card-3d">
+                    <div class="product-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Простой чат-бот</h3>
+                    <p>Интерактивный бот для общения с клиентами, ответов на вопросы и поддержки</p>
+                </div>
+                <div class="product-card glass card-3d">
+                    <div class="product-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3>Торговый бот</h3>
+                    <p>Базовый функционал для продаж с каталогом товаров и простой корзиной</p>
+                </div>
+                <div class="product-card glass card-3d">
+                    <div class="product-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h3>Торговая площадка</h3>
+                    <p>Полноценный маркетплейс с интеграцией API и расширенными возможностями</p>
+                </div>
+                <div class="product-card glass card-3d">
+                    <div class="product-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3>Игровой бот</h3>
+                    <p>Интерактивные игры, викторины и развлечения для вовлечения аудитории</p>
+                </div>
+                <div class="product-card glass card-3d">
+                    <div class="product-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    <h3>Новостной бот</h3>
+                    <p>Автоматическая публикация новостей, статей и уведомлений для подписчиков</p>
+                </div>
+                <div class="product-card glass card-3d">
+                    <div class="product-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Аналитический бот</h3>
+                    <p>Сбор и анализ данных, создание отчетов и визуализация статистики</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Наши возможности</h2>
+            <div class="features-grid">
+                <div class="feature-card glass card-3d">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>Автоматизация процессов</h3>
+                    <p>Создаем ботов для автоматизации рутинных задач, уведомлений и обработки запросов.</p>
+                </div>
+                <div class="feature-card glass card-3d">
+                    <div class="feature-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <h3>Интеграция с API</h3>
+                    <p>Подключаем ботов к внешним сервисам, CRM-системам и базам данных.</p>
+                </div>
+                <div class="feature-card glass card-3d">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Безопасность</h3>
+                    <p>Обеспечиваем защиту данных и устойчивость к взлому с помощью современных технологий.</p>
+                </div>
+                <div class="feature-card glass card-3d">
+                    <div class="feature-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h3>Высокая производительность</h3>
+                    <p>Оптимизированные боты, способные обрабатывать тысячи запросов одновременно.</p>
+                </div>
+                <div class="feature-card glass card-3d">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Адаптивный дизайн</h3>
+                    <p>Интерфейсы ботов, которые отлично работают на любых устройствах.</p>
+                </div>
+                <div class="feature-card glass card-3d">
+                    <div class="feature-icon">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <h3>Облачные технологии</h3>
+                    <p>Размещение на надежных серверах с автоматическим масштабированием.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <h2 class="section-title">Наши тарифы</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card glass card-3d">
+                    <h3>Базовый</h3>
+                    <div class="price">5 000 ₽</div>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Простой функционал</li>
+                        <li><i class="fas fa-check"></i> Базовые команды</li>
+                        <li><i class="fas fa-check"></i> Настройка ответов</li>
+                        <li><i class="fas fa-check"></i> Простая автоматизация</li>
+                    </ul>
+                    <div class="pricing-footer">
+                        <div class="price-btn-container">
+                            <a href="#contact" class="btn">Выбрать</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="pricing-card glass card-3d">
+                    <h3>Торговый бот</h3>
+                    <div class="price">15 000 ₽</div>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Каталог товаров</li>
+                        <li><i class="fas fa-check"></i> Корзина покупок</li>
+                        <li><i class="fas fa-check"></i> Система заказов</li>
+                        <li><i class="fas fa-check"></i> Уведомления</li>
+                    </ul>
+                    <div class="pricing-footer">
+                        <div class="price-btn-container">
+                            <a href="#contact" class="btn">Выбрать</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="pricing-card glass card-3d">
+                    <h3>Маркетплейс</h3>
+                    <div class="price">30 000 ₽</div>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Полный функционал</li>
+                        <li><i class="fas fa-check"></i> Интеграция с API</li>
+                        <li><i class="fas fa-check"></i> Мультивендорность</li>
+                        <li><i class="fas fa-check"></i> Платежные системы</li>
+                        <li><i class="fas fa-check"></i> Аналитика и отчеты</li>
+                    </ul>
+                    <div class="pricing-footer">
+                        <div class="price-btn-container">
+                            <a href="#contact" class="btn">Выбрать</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2 class="section-title">Свяжитесь с нами</h2>
+            <div class="contact-content">
+                <div class="contact-info glass">
+                    <div class="telegram-cta">
+                        <p>Напишите нам прямо в Telegram для быстрой связи и консультации</p>
+                        <a href="https://t.me/monamierri_bots" class="btn" target="_blank">
+                            <i class="fab fa-telegram"></i>
+                            Написать в Telegram
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">
+                    <i class="fab fa-telegram"></i>
+                    Monamierri<span>Bots</span>
+                </div>
+                <p>&copy; 2025 Monamierri Bots. Все права защищены.</p>
+                <ul class="social-links">
+                    <li><a href="https://t.me/monamierri_bots" target="_blank"><i class="fab fa-telegram"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Добавляем динамическое создание кругов для фона
+        document.addEventListener('DOMContentLoaded', function() {
+            const bgAnimation = document.querySelector('.bg-animation');
+
+            for (let i = 0; i < 8; i++) {
+                const circle = document.createElement('div');
+                const circleClass = `circle-${(i % 5) + 1}`;
+                circle.classList.add('bg-circle', circleClass);
+
+                const size = Math.random() * 400 + 100;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const delay = Math.random() * 15;
+
+                circle.style.width = `${size}px`;
+                circle.style.height = `${size}px`;
+                circle.style.top = `${posY}%`;
+                circle.style.left = `${posX}%`;
+                circle.style.animationDelay = `${delay}s`;
+
+                bgAnimation.appendChild(circle);
+            }
+
+            // Добавляем 3D эффект для карточек при наведении
+            const cards = document.querySelectorAll('.card-3d');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', function(e) {
+                    const x = e.clientX - this.getBoundingClientRect().left;
+                    const y = e.clientY - this.getBoundingClientRect().top;
+
+                    const centerX = this.offsetWidth / 2;
+                    const centerY = this.offsetHeight / 2;
+
+                    const angleY = (x - centerX) / 25;
+                    const angleX = (centerY - y) / 25;
+
+                    this.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) translateY(-10px)`;
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
